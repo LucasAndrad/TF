@@ -21,26 +21,64 @@ struct LISTA {
 
 typedef struct LISTA info;
 
-int menu () {
+void subOptions(info *list, int subOption);
+
+int menu() {
 	int opt=0;
 	cout << "\n\nEscolha uma opção:\n";
-	cout << "1 - Buscar por municipio\n";
-	cout << "2 - Buscar por CD's\n";
-	cout << "3 - Buscar por Total\n";
-	cout << "0 - Para sair do programa\n\n";
+	cout << "1 - Importar dados\n";
+	cout << "2 - Gerar relatório (ordenados por):\n";
+	cout << "3 - Relatório de um Estado\n";
+	cout << "5 - Consultadar dados de um Município\n";
+	cout << "0 - Sair do sistema\n";
+	cin >> opt;
+	return opt;
+}
+
+int subMenu() {
+
+	int opt=0;
+	cout << "\n1 - Município\n";
+	cout << "2 - CD\n";
+	cout << "3 - Total\n";
 	cin >> opt;
 	return opt;
 }
 
 void Options (info *list, int Option) {
 	
+	int choose=0;
+	
 	switch (Option) {
 		case 0: 
-			cout << "\nThank you for using the program\n";			
+			cout << "\nThank you for using the program.\n";			
+			break;
+		
+		case 1:
+			break;
+
+		case 2:
+			choose = subMenu();
+			subOptions(list, choose);
 			break;
 
 		default: 
 			cout << "\nYou can't do this!\nPlease choose another option.\n";
+	}
+}
+
+void subOptions (info *list, int subOption) {
+
+	switch (subOption) {
+		case 1:
+			break;
+			
+		case 2:
+			break;
+			
+		case 3:
+			cout << "It's working\n";
+			break;
 	}
 }
 
