@@ -43,7 +43,6 @@ typedef struct ufTreeSearch ufNo;
 
 // função que insere valor na uf tree, ufNo
 void insertUfNo(ufNo *ufTree, int lineNumber) {
-// TESTAR ESSA FUNÇÃO QUE FOI IMPLEMENTADA DE ACORDO COM O VIDEO DO PROGRAMACAO DESCOMPLICADA
 
 	if (ufTree == NULL) {
 		return ;
@@ -87,38 +86,60 @@ void insertUfNo(ufNo *ufTree, int lineNumber) {
   return ;
 }
 
+// função que recebe o valor Total de linha atual no arquivo.
+int getValueTotal() {
+
+	char w;
+	int total, count=0;
+	while (count != 10) {
+		w = fgetc(csvFile);
+		if (w == ';') {
+			count++;
+		}
+	}
+	if (count == 10) {
+		fscanf(csvFile, "%d", &total);
+	}
+	return total;
+}
+
 // lendo arquivo csv e inserindo dados arvore de busca por estado(UF)
 void getStateLines(ufNo *ufTree, char *STATE) {
 
-	int line=1;
+	int line=1, count=0;
+	int valueTotal=0;
 	csvFile = fopen ("dados.csv", "r");
 	char u;
 	do {
 		  u = fgetc(csvFile);
+		  count++;
 		  if (u==EOF) break;
 
-			else if (u == ';') {
+			else if (count>2) {
 					while (u != '\n') {
 						u = fgetc(csvFile);
 						if (u == '\n') {
 							line++;
+							count=0;
 							break;
 					}
 				}
 			}
 		
-		  else if (u == STATE[0]) {
+		  else if (count < 3 && u == STATE[0]) {
 				u = fgetc(csvFile);
-				if (u == STATE[1]) {
+				if (count < 3 && u == STATE[1]) {
 					//cout << "Numero da linha = " << line << endl;
-					valueTotal = getValueTotal(allLine); // essa função vai receber a linha toda e verificar
+					//valueTotal = getValueTotal(); // essa função vai receber a linha toda e verificar
 					 //qual é o valor depois do ultimo ";" (o decimo) que corresponde ao valor da variavel total 
+					//cout << "valor total = " << valueTotal << endl;
 					insertUfNo(ufTree, line);
-
+					valueTotal = 0;
 					while (u != '\n') {
 						u = fgetc(csvFile);
 						if (u == '\n') {
 							line++;
+							count = 0;
 							break;
 						}
 					}
@@ -231,6 +252,8 @@ int main() {
 	while (option!=5) {
 		Options(ufTree, option);
 		option = 0;
+		free(ufTree);
+		ufNo *ufTree = (ufNo *) malloc(sizeof(ufNo));
 		option = menu();
 	}
 	
