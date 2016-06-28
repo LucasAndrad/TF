@@ -138,7 +138,17 @@ char *Uf() {
 	return state; 
 }
 
-//menu principal
+// essa função mostra o conteúdo da árvore
+void showUfTree(ufNo *ufTree) {
+
+	if (ufTree != NULL) {
+		showUfTree(ufTree->left);
+		cout << "Número da linha: "<< ufTree->line << endl; 
+		showUfTree(ufTree->right);
+	}
+}
+
+// menu principal
 void subOptions(int subOption);
 
 int menu() {
@@ -183,6 +193,7 @@ void Options (ufNo *ufTree, int Option) {
 		case 4:
 			uf = Uf();
 			getStateLines(ufTree, uf);
+			showUfTree(ufTree);
 			break;
 
 		case 5: 
