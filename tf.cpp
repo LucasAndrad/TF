@@ -33,8 +33,8 @@ typedef struct LISTA info;
 //arvore de busca para estado.
 struct ufTreeSearch {
 	
-	//char ufKey[2];
 	int line;
+	int total;
 	struct ufTreeSearch *left;
   struct ufTreeSearch *right;
 };
@@ -111,7 +111,8 @@ void getStateLines(ufNo *ufTree, char *STATE) {
 				u = fgetc(csvFile);
 				if (u == STATE[1]) {
 					//cout << "Numero da linha = " << line << endl;
-
+					valueTotal = getValueTotal(allLine); // essa função vai receber a linha toda e verificar
+					 //qual é o valor depois do ultimo ";" (o decimo) que corresponde ao valor da variavel total 
 					insertUfNo(ufTree, line);
 
 					while (u != '\n') {
