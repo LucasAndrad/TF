@@ -1,3 +1,9 @@
+// *** LINKS 
+// https://www.youtube.com/watch?v=8cdbmsPaR-k
+// https://www.youtube.com/watch?v=PsH737U2Mnc
+// http://www.ime.usp.br/~pf/algoritmos/aulas/binst.html
+// https://pt.wikibooks.org/wiki/Programar_em_C/%C3%81rvores_bin%C3%A1rias
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,11 +44,7 @@ typedef struct ufTreeSearch ufNo;
 // função que insere valor na uf tree, ufNo
 void insertUfNo(ufNo *ufTree, int lineNumber) {
 // TESTAR ESSA FUNÇÃO QUE FOI IMPLEMENTADA DE ACORDO COM O VIDEO DO PROGRAMACAO DESCOMPLICADA
-// *** LINKS 
-// https://www.youtube.com/watch?v=8cdbmsPaR-k
-// https://www.youtube.com/watch?v=PsH737U2Mnc
-// http://www.ime.usp.br/~pf/algoritmos/aulas/binst.html
-// https://pt.wikibooks.org/wiki/Programar_em_C/%C3%81rvores_bin%C3%A1rias
+
 	if (ufTree == NULL) {
 		return ;
 	}
@@ -62,14 +64,10 @@ void insertUfNo(ufNo *ufTree, int lineNumber) {
 	}
 
   else {
-		ufNo *current = *ufTree;
-		ufNo *behind = NULL
+		ufNo *current = ufTree;
+		ufNo *behind = NULL;
 		while (current != NULL) {
 			behind = current;
-			if (lineNumber == current->line) {
-				free(helperUfTree);
-				return ; // esse if não insere nada pois o elemento já existe na árvore
-			}
 
 			if (lineNumber > current->line) {
 				current = current->right;
@@ -90,7 +88,7 @@ void insertUfNo(ufNo *ufTree, int lineNumber) {
 }
 
 // lendo arquivo csv e inserindo dados arvore de busca por estado(UF)
-void getStateLines(char *STATE) {
+void getStateLines(ufNo *ufTree, char *STATE) {
 
 	int line=1;
 	csvFile = fopen ("dados.csv", "r");
@@ -114,7 +112,7 @@ void getStateLines(char *STATE) {
 				if (u == STATE[1]) {
 					//cout << "Numero da linha = " << line << endl;
 
-					insertUfTree(ufNo **ufTree, line);
+					insertUfNo(ufTree, line);
 
 					while (u != '\n') {
 						u = fgetc(csvFile);
@@ -141,7 +139,7 @@ char *Uf() {
 }
 
 //menu principal
-void subOptions(info *list, int subOption);
+void subOptions(int subOption);
 
 int menu() {
 	int opt=0;
@@ -167,7 +165,7 @@ int subMenu() {
 }
 
 // executando ações do menu
-void Options (info *list, int Option) {
+void Options (ufNo *ufTree, int Option) {
 	
 	int choose=0;
 	char *uf;
@@ -179,12 +177,12 @@ void Options (info *list, int Option) {
 
 		case 2:
 			choose = subMenu();
-			subOptions(list, choose);
+			subOptions(choose);
 			break;
 
 		case 4:
 			uf = Uf();
-			getStateLines(uf);
+			getStateLines(ufTree, uf);
 			break;
 
 		case 5: 
@@ -197,7 +195,7 @@ void Options (info *list, int Option) {
 }
 
 //opcões de ordenamento da opção 2 do menu principal
-void subOptions (info *list, int subOption) {
+void subOptions (int subOption) {
 
 	switch (subOption) {
 		case 1:
@@ -216,10 +214,10 @@ int main() {
 
 	int option=0;
 	option = menu();
-	info *list = (info *) malloc(sizeof(info));
+	ufNo *ufTree = (ufNo *) malloc(sizeof(ufNo));
 
 	while (option!=5) {
-		Options(list, option);
+		Options(ufTree, option);
 		option = 0;
 		option = menu();
 	}
