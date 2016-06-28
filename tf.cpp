@@ -14,7 +14,7 @@ struct LISTA {
 	char munucipio[30];
 
 //	colonas do arquivo CSV, essas siglas estão explicadas no PDF 
-//	"Total" é um dos valores que vamos buscar na arvore
+//	"Total" é um dos valores da lista que vamos buscar na arvore
 	int cd, epao, tpd, 
 			lb, tsb, asb,
 			apd, epo;
@@ -35,13 +35,67 @@ struct ufTreeSearch {
 
 typedef struct ufTreeSearch ufNo;
 
+// função que insere valor na uf tree, ufNo
+void insertUfNo(ufNo *ufTree, int lineNumber) {
+// TESTAR ESSA FUNÇÃO QUE FOI IMPLEMENTADA DE ACORDO COM O VIDEO DO PROGRAMACAO DESCOMPLICADA
+// *** LINKS 
+// https://www.youtube.com/watch?v=8cdbmsPaR-k
+// https://www.youtube.com/watch?v=PsH737U2Mnc
+// http://www.ime.usp.br/~pf/algoritmos/aulas/binst.html
+// https://pt.wikibooks.org/wiki/Programar_em_C/%C3%81rvores_bin%C3%A1rias
+	if (ufTree == NULL) {
+		return ;
+	}
+
+  ufNo *helperUfTree = (ufNo *) malloc(sizeof(ufNo));
+
+  if (helperUfTree == NULL) {
+		return ;
+	}
+
+  helperUfTree->line = lineNumber;
+  helperUfTree->left = NULL;
+  helperUfTree->right = NULL;
+
+  if (ufTree == NULL) {
+		ufTree = helperUfTree;
+	}
+
+  else {
+		ufNo *current = *ufTree;
+		ufNo *behind = NULL
+		while (current != NULL) {
+			behind = current;
+			if (lineNumber == current->line) {
+				free(helperUfTree);
+				return ; // esse if não insere nada pois o elemento já existe na árvore
+			}
+
+			if (lineNumber > current->line) {
+				current = current->right;
+			}
+			else {
+				current = current->left;
+			}
+		}
+		if (lineNumber > behind->line) {
+			behind->right = helperUfTree;
+		}
+		else {
+			behind->left = helperUfTree;
+		}
+   
+  }
+  return ;
+}
+
 // lendo arquivo csv e inserindo dados arvore de busca por estado(UF)
 void getStateLines(char *STATE) {
 
 	int line=1;
 	csvFile = fopen ("dados.csv", "r");
 	char u;
-	  do {
+	do {
 		  u = fgetc(csvFile);
 		  if (u==EOF) break;
 
@@ -55,13 +109,13 @@ void getStateLines(char *STATE) {
 				}
 			}
 		
-
 		  else if (u == STATE[0]) {
 				u = fgetc(csvFile);
 				if (u == STATE[1]) {
-					cout << "Numero da linha = " << line << endl;
-// apagar linha de cima. E inserir valor das linhas na ufTree
-					//insertUfTree(ufNo **ufTree, line);
+					//cout << "Numero da linha = " << line << endl;
+
+					insertUfTree(ufNo **ufTree, line);
+
 					while (u != '\n') {
 						u = fgetc(csvFile);
 						if (u == '\n') {
@@ -74,7 +128,8 @@ void getStateLines(char *STATE) {
 			else { // não faz nada!
 			}
 
-  } while(u!=EOF);
+	} while(u!=EOF);
+	fclose(csvFile);
 }
 // recebe o estado para ser usado na busca
 char *Uf() {
