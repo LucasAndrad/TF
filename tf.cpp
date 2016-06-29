@@ -14,35 +14,17 @@ using namespace std;
 //arquivo que recebe o csv
 FILE *csvFile;
 
-struct LISTA {
-
-	char uf[2];	
-	char munucipio[30];
-
-//	colonas do arquivo CSV, essas siglas estão explicadas no PDF 
-//	"Total" é um dos valores da lista que vamos buscar na arvore
-	int cd, epao, tpd, 
-			lb, tsb, asb,
-			apd, epo;
-	int total;
-	struct LISTA *next;
-};
-
-typedef struct LISTA info;
-
 //arvore de busca para estado.
-struct ufTreeSearch {
+typedef struct ufTreeSearch {
 	
 	int line;
 	int total;
 	struct ufTreeSearch *left;
   struct ufTreeSearch *right;
-};
-
-typedef struct ufTreeSearch ufNo;
+}ufNo;
 
 // função que insere valor na uf tree, ufNo
-void insertUfNo(ufNo *ufTree, int lineNumber) {
+void insertUfNo(ufNo *ufTree, int totalValue, int lineNumber) {
 
 	if (ufTree == NULL) {
 		return ;
@@ -54,7 +36,8 @@ void insertUfNo(ufNo *ufTree, int lineNumber) {
 		return ;
 	}
 
-  helperUfTree->line = lineNumber;
+  helperUfTree->total = totalValue;
+	helperUfTree->line = lineNumber;
   helperUfTree->left = NULL;
   helperUfTree->right = NULL;
 
@@ -68,14 +51,14 @@ void insertUfNo(ufNo *ufTree, int lineNumber) {
 		while (current != NULL) {
 			behind = current;
 
-			if (lineNumber > current->line) {
+			if (totalValue > current->total) {
 				current = current->right;
 			}
 			else {
 				current = current->left;
 			}
 		}
-		if (lineNumber > behind->line) {
+		if (totalValue > behind->total) {
 			behind->right = helperUfTree;
 		}
 		else {
@@ -85,6 +68,17 @@ void insertUfNo(ufNo *ufTree, int lineNumber) {
   }
   return ;
 }
+
+// função que libera cada nó da arvore
+void freeUfTree(ufNo *&ufTree){
+    if(ufTree != NULL) {
+        freeUfTree(ufTree->left);
+        freeUfTree(ufTree->right);
+        free(ufTree);
+        ufTree = NULL;
+    }
+}
+
 
 // função que recebe o valor Total de linha atual no arquivo.
 int getValueTotal() {
@@ -129,11 +123,9 @@ void getStateLines(ufNo *ufTree, char *STATE) {
 		  else if (count < 3 && u == STATE[0]) {
 				u = fgetc(csvFile);
 				if (count < 3 && u == STATE[1]) {
-					//cout << "Numero da linha = " << line << endl;
-					//valueTotal = getValueTotal(); // essa função vai receber a linha toda e verificar
+					valueTotal = getValueTotal(); // essa função vai receber a linha toda e verificar
 					 //qual é o valor depois do ultimo ";" (o decimo) que corresponde ao valor da variavel total 
-					//cout << "valor total = " << valueTotal << endl;
-					insertUfNo(ufTree, line);
+					insertUfNo(ufTree, valueTotal, line);
 					valueTotal = 0;
 					while (u != '\n') {
 						u = fgetc(csvFile);
@@ -165,7 +157,7 @@ void showUfTree(ufNo *ufTree) {
 
 	if (ufTree != NULL) {
 		showUfTree(ufTree->left);
-		cout << "Número da linha: "<< ufTree->line << endl; 
+		cout << "Total: "<< ufTree->total << endl;
 		showUfTree(ufTree->right);
 	}
 }
@@ -216,6 +208,7 @@ void Options (ufNo *ufTree, int Option) {
 			uf = Uf();
 			getStateLines(ufTree, uf);
 			showUfTree(ufTree);
+			freeUfTree(ufTree);
 			break;
 
 		case 5: 
@@ -247,14 +240,13 @@ int main() {
 
 	int option=0;
 	option = menu();
-	ufNo *ufTree = (ufNo *) malloc(sizeof(ufNo));
+	//ufNo *ufTree = (ufNo *) malloc(sizeof(ufNo));
 
 	while (option!=5) {
+		ufNo *ufTree = (ufNo *) malloc(sizeof(ufNo));
 		Options(ufTree, option);
 		option = 0;
-		free(ufTree);
-		ufNo *ufTree = (ufNo *) malloc(sizeof(ufNo));
-		option = menu();
+		option = menu();		
 	}
 	
 }
