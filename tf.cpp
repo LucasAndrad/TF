@@ -15,6 +15,7 @@ using namespace std;
 
 //arquivo que recebe o csv
 FILE *csvFile;
+FILE *arq;
 
 //arvore de busca para UF
 typedef struct ufTreeSearch {
@@ -68,6 +69,7 @@ void insertCityTree(cityNo *cityTree, char *CITYH, int lineNumber);
 void showCityTree(cityNo *cityTree);
 char *getCity();
 
+void showAllData(int lineH);
 void showCdTree(cdNo *cdTree);
 void insertCdTree(cdNo *cdTree, int cdValue, int lineNumber);
 void freeCdTree(cdNo *&cdTree);
@@ -96,9 +98,9 @@ int main() {
 		option = 0;
 		option = menu();		
 	}
-	freeCityTree(cityTree);
+	//freeCityTree(cityTree);
 	freeCdTree(cdTree);
-	freeTotalTree(totalTree)
+	freeTotalTree(totalTree);
 	
 	return 0;
 }
@@ -464,7 +466,8 @@ void showUfTree(ufNo *ufTree) {
 
 	if (ufTree != NULL) {
 		showUfTree(ufTree->left);
-		cout << "Total: "<< ufTree->total << "   linha: "<< ufTree->line << endl;
+		//cout << "Total: "<< ufTree->total << "   linha: "<< ufTree->line << endl;
+		showAllData(ufTree->line);
 		showUfTree(ufTree->right);
 	}
 }
@@ -474,7 +477,8 @@ void showCityTree(cityNo *cityTree) {
 
 	if (cityTree != NULL) {
 		showCityTree(cityTree->left);
-		cout << "MUNICIPIO: "<< cityTree->city << "   linha: "<< cityTree->line << endl;
+		//cout << "MUNICIPIO: "<< cityTree->city << "   linha: "<< cityTree->line << endl;
+		showAllData(cityTree->line);
 		showCityTree(cityTree->right);
 	}
 }
@@ -484,7 +488,8 @@ void showCdTree(cdNo *cdTree) {
 
 	if (cdTree != NULL) {
 		showCdTree(cdTree->left);
-		cout << "CD: "<< cdTree->cd << "   linha: "<< cdTree->line << endl;
+		//cout << "CD: "<< cdTree->cd << "   linha: "<< cdTree->line << endl;
+		showAllData(cdTree->line);
 		showCdTree(cdTree->right);
 	}
 }
@@ -494,11 +499,28 @@ void showTotalTree(totalNo *totalTree) {
 	
 	if (totalTree != NULL) {
 		showTotalTree(totalTree->left);
-		cout << "TOTAL: " << totalTree->total << "   linha: " << totalTree->line << endl;
+		//cout << "TOTAL: " << totalTree->total << "   linha: " << totalTree->line << endl;
+		showAllData(totalTree->line);
 		showTotalTree(totalTree->right); 
 	}
 }
 
+// mostrando todos os dados de uma linha
+void showAllData(int lineH) {
+	
+	arq = fopen("dados.csv", "r");
+	char f[100];
+	if (lineH < 10000 && lineH != 0) {
+		int i=0;
+		while (i<lineH) {
+		i++;
+		fgets(f, sizeof(f), arq);
+	
+		}
+		cout << f;
+	}
+	fclose(arq);
+}
 // menu principal
 int menu() {
 	int opt=0;
