@@ -14,7 +14,7 @@ using namespace std;
 //arquivo que recebe o csv
 FILE *csvFile;
 
-//arvore de busca para estado.
+//arvore de busca para UF
 typedef struct ufTreeSearch {
 	
 	int line;
@@ -23,18 +23,97 @@ typedef struct ufTreeSearch {
   struct ufTreeSearch *right;
 }ufNo;
 
-// função que insere valor na uf tree, ufNo
+// arvore de busca para CD
+typedef struct cdSearch {
+	
+	int line;
+	int cd;
+	struct cdSearch *left;
+  struct cdSearch *right;
+}cdNo;
+
+// funções
+void insertUfNo(ufNo *ufTree, int totalValue, int lineNumber);
+void freeUfTree(ufNo *&ufTree);
+int getValueTotal();
+void getStateLines(ufNo *ufTree, char *STATE);
+char *Uf();
+void showUfTree(ufNo *ufTree);
+int menu();
+int subMenu();
+void Options (cdNo *cdTree, ufNo *ufTree, int Option);
+void subOptions (cdNo *cdTree, int subOption);
+void showCdTree(cdNo *cdTree);
+void insertCdTree(cdNo *cdTree, int cdValue, int lineNumber);
+void freeCdTree(cdNo *&cdTree);
+int getCdValue();
+void getCdLines(cdNo *cdTree);
+
+// main começa aqui
+int main() {
+
+	int option=0;
+	option = menu();
+	cdNo *cdTree;
+	cdTree = (cdNo *) malloc(sizeof(cdNo));
+	cdTree->left = NULL;
+	cdTree->right = NULL;
+
+	while (option!=5) {
+		csvFile = fopen ("teste.csv", "r");
+		ufNo *ufTree = (ufNo *) malloc(sizeof(ufNo));
+		Options(cdTree, ufTree, option);
+		option = 0;
+		option = menu();		
+	}
+	freeCdTree(cdTree);
+	
+	return 0;
+}
+
+// insere valor CD na cdTree
+void insertCdTree(cdNo *cdTree, int cdValue, int lineNumber) {
+	
+	cdNo *helperCdTree = (cdNo *) malloc(sizeof(cdNo));
+
+	helperCdTree->cd = cdValue;
+	helperCdTree->line = lineNumber;
+  helperCdTree->left = NULL;
+  helperCdTree->right = NULL;
+
+	if (cdTree == NULL) {
+			cdTree = helperCdTree;
+	}
+
+	else {
+		cdNo *current = cdTree;
+		cdNo *behind = NULL;
+		while (current != NULL) {
+			behind = current;
+
+			if (cdValue > current->cd) {
+				current = current->right;
+			}
+			else {
+				current = current->left;
+			}
+		}
+		if (cdValue > behind->cd) {
+			behind->right = helperCdTree;
+		}
+		else {
+			behind->left = helperCdTree;
+		}
+   
+  }
+  return ;
+	
+}
+
+// insere valor na uf tree, ufNo
 void insertUfNo(ufNo *ufTree, int totalValue, int lineNumber) {
 
-	if (ufTree == NULL) {
-		return ;
-	}
-
   ufNo *helperUfTree = (ufNo *) malloc(sizeof(ufNo));
-
-  if (helperUfTree == NULL) {
-		return ;
-	}
 
   helperUfTree->total = totalValue;
 	helperUfTree->line = lineNumber;
@@ -69,8 +148,8 @@ void insertUfNo(ufNo *ufTree, int totalValue, int lineNumber) {
   return ;
 }
 
-// função que libera cada nó da arvore
-void freeUfTree(ufNo *&ufTree){
+// libera cada nó da arvore UF
+void freeUfTree(ufNo *&ufTree) {
     if(ufTree != NULL) {
         freeUfTree(ufTree->left);
         freeUfTree(ufTree->right);
@@ -79,12 +158,21 @@ void freeUfTree(ufNo *&ufTree){
     }
 }
 
+// libera cada nó da árvore CD
+void freeCdTree(cdNo *&cdTree) {
+    if(cdTree != NULL) {
+        freeCdTree(cdTree->left);
+        freeCdTree(cdTree->right);
+        free(cdTree);
+        cdTree = NULL;
+    }
+}
 
-// função que recebe o valor Total de linha atual no arquivo.
+// recebe o valor Total de linha atual no arquivo
 int getValueTotal() {
 
 	char w;
-	int total, count=0;
+	int total=0, count=0;
 	while (count != 10) {
 		w = fgetc(csvFile);
 		if (w == ';') {
@@ -97,12 +185,53 @@ int getValueTotal() {
 	return total;
 }
 
+// recebe o valor CD da linha atual do arquivo
+int getCdValue() {
+
+	char w;
+	int cd=0, count=0;
+	while (count != 2) {
+		w = fgetc(csvFile);
+		if (w == ';') {
+			count++;
+		}
+	}
+	if (count == 2) {
+		fscanf(csvFile, "%d", &cd);
+	}
+	return cd;		
+}
+
+// pegando os valores de CD e inserindo na arvore cdTree
+void getCdLines(cdNo *cdTree) {
+
+	int line=1;
+	int cdValue=0;
+	char u;
+	do {
+		u = fgetc(csvFile);
+		if (u == EOF) break;
+		cdValue = getCdValue();
+		//cout << "CD = " << cdValue << "   linha: " << line << endl;
+		insertCdTree(cdTree, cdValue, line);
+		while (u != '\n') {
+			u = fgetc(csvFile);
+			if (u == EOF) break;	
+			if (u == '\n') {
+				line++;
+				break;
+			}
+		}
+
+	} while(u!=EOF);
+	fclose(csvFile);
+}
+
 // lendo arquivo csv e inserindo dados arvore de busca por estado(UF)
 void getStateLines(ufNo *ufTree, char *STATE) {
 
 	int line=1, count=0;
 	int valueTotal=0;
-	csvFile = fopen ("dados.csv", "r");
 	char u;
 	do {
 		  u = fgetc(csvFile);
@@ -141,6 +270,7 @@ void getStateLines(ufNo *ufTree, char *STATE) {
 			}
 
 	} while(u!=EOF);
+	line=1;
 	fclose(csvFile);
 }
 // recebe o estado para ser usado na busca
@@ -152,19 +282,27 @@ char *Uf() {
 	return state; 
 }
 
-// essa função mostra o conteúdo da árvore
+// mostra o conteúdo da árvore UF
 void showUfTree(ufNo *ufTree) {
 
 	if (ufTree != NULL) {
 		showUfTree(ufTree->left);
-		cout << "Total: "<< ufTree->total << endl;
+		cout << "Total: "<< ufTree->total << "   linha: "<< ufTree->line << endl;
 		showUfTree(ufTree->right);
 	}
 }
 
-// menu principal
-void subOptions(int subOption);
+// mostra o conteúdo da árvore CD
+void showCdTree(cdNo *cdTree) {
 
+	if (cdTree != NULL) {
+		showCdTree(cdTree->left);
+		cout << "CD: "<< cdTree->cd << "   linha: "<< cdTree->line << endl;
+		showCdTree(cdTree->right);
+	}
+}
+
+// menu principal
 int menu() {
 	int opt=0;
 	cout << "\n\nEscolha uma opção:\n";
@@ -189,7 +327,7 @@ int subMenu() {
 }
 
 // executando ações do menu
-void Options (ufNo *ufTree, int Option) {
+void Options (cdNo *cdTree, ufNo *ufTree, int Option) {
 	
 	int choose=0;
 	char *uf;
@@ -197,11 +335,12 @@ void Options (ufNo *ufTree, int Option) {
 	switch (Option) {
 		
 		case 1:
+			getCdLines(cdTree);
 			break;
 
 		case 2:
 			choose = subMenu();
-			subOptions(choose);
+			subOptions(cdTree, choose);
 			break;
 
 		case 4:
@@ -221,13 +360,14 @@ void Options (ufNo *ufTree, int Option) {
 }
 
 //opcões de ordenamento da opção 2 do menu principal
-void subOptions (int subOption) {
+void subOptions (cdNo *cdTree, int subOption) {
 
 	switch (subOption) {
 		case 1:
 			break;
 			
 		case 2:
+			showCdTree(cdTree);
 			break;
 			
 		case 3:
@@ -236,17 +376,8 @@ void subOptions (int subOption) {
 	}
 }
 
-int main() {
 
-	int option=0;
-	option = menu();
-	//ufNo *ufTree = (ufNo *) malloc(sizeof(ufNo));
 
-	while (option!=5) {
-		ufNo *ufTree = (ufNo *) malloc(sizeof(ufNo));
-		Options(ufTree, option);
-		option = 0;
-		option = menu();		
-	}
-	
-}
+
+
+
