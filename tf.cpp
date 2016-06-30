@@ -3,6 +3,8 @@
 // https://www.youtube.com/watch?v=PsH737U2Mnc
 // http://www.ime.usp.br/~pf/algoritmos/aulas/binst.html
 // https://pt.wikibooks.org/wiki/Programar_em_C/%C3%81rvores_bin%C3%A1rias
+//*********************
+// PRECISA JUNTAR OS GETS. COLOCAR O GET CD, GET TOTAL E GET MUNICIPIO TODOS JUNTOS.
 
 #include <iostream>
 #include <stdio.h>
@@ -32,6 +34,15 @@ typedef struct cdSearch {
   struct cdSearch *right;
 }cdNo;
 
+// arvore de busca para TOTAL
+typedef struct totalSearch {
+	
+	int line;
+	int total;
+	struct cdSearch *left;
+  struct cdSearch *right;
+}totalNo;
+
 // funções
 void insertUfNo(ufNo *ufTree, int totalValue, int lineNumber);
 void freeUfTree(ufNo *&ufTree);
@@ -41,32 +52,36 @@ char *Uf();
 void showUfTree(ufNo *ufTree);
 int menu();
 int subMenu();
-void Options (cdNo *cdTree, ufNo *ufTree, int Option);
-void subOptions (cdNo *cdTree, int subOption);
+void Options (totalNo *totalTree, cdNo *cdTree, ufNo *ufTree, int Option);
+void subOptions (totalNo *totalTree, cdNo *cdTree, int subOption);
+
 void showCdTree(cdNo *cdTree);
 void insertCdTree(cdNo *cdTree, int cdValue, int lineNumber);
 void freeCdTree(cdNo *&cdTree);
 int getCdValue();
 void getCdLines(cdNo *cdTree);
 
+
+void getTotalLines(totalNo *totalTree);
+
 // main começa aqui
 int main() {
 
 	int option=0;
 	option = menu();
-	cdNo *cdTree;
-	cdTree = (cdNo *) malloc(sizeof(cdNo));
-	cdTree->left = NULL;
-	cdTree->right = NULL;
+	cdNo *cdTree = (cdNo *) malloc(sizeof(cdNo));
+	totalNo *totalTree = (totalNo *) malloc(sizeof(totalNo));
+
 
 	while (option!=5) {
-		csvFile = fopen ("teste.csv", "r");
+		csvFile = fopen ("dados.csv", "r");
 		ufNo *ufTree = (ufNo *) malloc(sizeof(ufNo));
-		Options(cdTree, ufTree, option);
+		Options(totalTree, cdTree, ufTree, option);
 		option = 0;
 		option = menu();		
 	}
 	freeCdTree(cdTree);
+
 	
 	return 0;
 }
@@ -202,6 +217,31 @@ int getCdValue() {
 	return cd;		
 }
 
+// pegando valor total e inserindo na arcore totalTree
+void getTotalLines(totalNo *totalTree) {
+
+	int line=1;
+	int totalValue=0;
+	char u;
+	do {
+		u = fgetc(csvFile);
+		if (u == EOF) break;
+		totalValue = getValueTotal();
+		cout << "TOTAL = " << totalValue << "   linha: " << line << endl;
+		//insertTotalTree(totalTree, totalValue, line);
+		while (u != '\n') {
+			u = fgetc(csvFile);
+			if (u == EOF) break;	
+			if (u == '\n') {
+				line++;
+				break;
+			}
+		}
+
+	} while(u!=EOF);
+	fclose(csvFile);
+}
+
 // pegando os valores de CD e inserindo na arvore cdTree
 void getCdLines(cdNo *cdTree) {
 
@@ -327,7 +367,7 @@ int subMenu() {
 }
 
 // executando ações do menu
-void Options (cdNo *cdTree, ufNo *ufTree, int Option) {
+void Options (totalNo *totalTree, cdNo *cdTree, ufNo *ufTree, int Option) {
 	
 	int choose=0;
 	char *uf;
@@ -335,12 +375,17 @@ void Options (cdNo *cdTree, ufNo *ufTree, int Option) {
 	switch (Option) {
 		
 		case 1:
+			cdTree->left = NULL;
+			cdTree->right = NULL;
 			getCdLines(cdTree);
+			totalTree->left = NULL;
+			totalTree->right = NULL;
+			//getTotalLines(totalTree);
 			break;
 
 		case 2:
 			choose = subMenu();
-			subOptions(cdTree, choose);
+			subOptions(totalTree, cdTree, choose);
 			break;
 
 		case 4:
@@ -360,7 +405,7 @@ void Options (cdNo *cdTree, ufNo *ufTree, int Option) {
 }
 
 //opcões de ordenamento da opção 2 do menu principal
-void subOptions (cdNo *cdTree, int subOption) {
+void subOptions (totalNo *totalTree, cdNo *cdTree, int subOption) {
 
 	switch (subOption) {
 		case 1:
@@ -371,7 +416,7 @@ void subOptions (cdNo *cdTree, int subOption) {
 			break;
 			
 		case 3:
-			cout << "It's working\n";
+			
 			break;
 	}
 }
