@@ -39,8 +39,8 @@ typedef struct totalSearch {
 	
 	int line;
 	int total;
-	struct cdSearch *left;
-  struct cdSearch *right;
+	struct totalSearch *left;
+  struct totalSearch *right;
 }totalNo;
 
 // funções
@@ -58,11 +58,14 @@ void subOptions (totalNo *totalTree, cdNo *cdTree, int subOption);
 void showCdTree(cdNo *cdTree);
 void insertCdTree(cdNo *cdTree, int cdValue, int lineNumber);
 void freeCdTree(cdNo *&cdTree);
+void freeTotalTree(totalNo *&totalTree);
 int getCdValue();
-void getCdLines(cdNo *cdTree);
 
+int getNewTotalValue();
+void insertTotalTree(totalNo *totalTree, int totalValue, int lineNumber);
+void getCdLines(totalNo *totalTree, cdNo *cdTree);
 
-void getTotalLines(totalNo *totalTree);
+void showTotalTree(totalNo *totalTree);
 
 // main começa aqui
 int main() {
@@ -119,6 +122,56 @@ void insertCdTree(cdNo *cdTree, int cdValue, int lineNumber) {
 		else {
 			behind->left = helperCdTree;
 		}
+		
+		if (current != NULL) {
+			freeCdTree(current);
+			freeCdTree(behind);
+			freeCdTree(helperCdTree);
+		}
+  }
+  return ;
+	
+}
+// insere valor TOTAL na totalTree
+// insere valor TOTAL na totalTree
+void insertTotalTree(totalNo *totalTree, int totalValue, int lineNumber) {
+	
+	totalNo *helperTotalTree = (totalNo *) malloc(sizeof(totalNo));
+	
+	helperTotalTree->total = totalValue;
+	helperTotalTree->line = lineNumber;
+  helperTotalTree->left = NULL;
+  helperTotalTree->right = NULL;
+
+	if (totalTree == NULL) {
+			totalTree = helperTotalTree; cout << "entra no if\n";
+	}
+
+	else {
+		//cout << "entra no else\n";
+		totalNo *current =totalTree;
+		totalNo *behind = NULL;
+		while (current != NULL) {
+			behind = current;
+
+			if (totalValue > current->total) {
+				current = current->right;
+			}
+			else {
+				current = current->left;
+			}
+		}
+		if (totalValue > behind->total) {
+			behind->right = helperTotalTree;
+		}
+		else {
+			behind->left = helperTotalTree;
+		}
+		if (current != NULL) {
+			freeTotalTree(current); cout << "libere as arvores\n";
+			freeTotalTree(behind);
+			freeTotalTree(helperTotalTree);
+		}
    
   }
   return ;
@@ -163,6 +216,17 @@ void insertUfNo(ufNo *ufTree, int totalValue, int lineNumber) {
   return ;
 }
 
+// libera cada nó da árvore TOTAL
+void freeTotalTree(totalNo *&totalTree) {
+
+	if(totalTree != NULL) {
+		freeTotalTree(totalTree->left);
+		freeTotalTree(totalTree->right);
+		free(totalTree);
+		totalTree = NULL;
+	} 
+}
+
 // libera cada nó da arvore UF
 void freeUfTree(ufNo *&ufTree) {
     if(ufTree != NULL) {
@@ -200,6 +264,22 @@ int getValueTotal() {
 	return total;
 }
 
+// recebe o valor total depois depois do getCdValue
+int getNewTotalValue() {
+
+	char w;
+	int total=0, count=2;
+	while (count != 10) {
+		w = fgetc(csvFile);
+		if (w == ';') {
+			count++;
+		}
+	}
+	if (count == 10) {
+		fscanf(csvFile, "%d", &total);
+	}
+	return total;
+}
 // recebe o valor CD da linha atual do arquivo
 int getCdValue() {
 
@@ -217,42 +297,20 @@ int getCdValue() {
 	return cd;		
 }
 
-// pegando valor total e inserindo na arcore totalTree
-void getTotalLines(totalNo *totalTree) {
-
-	int line=1;
-	int totalValue=0;
-	char u;
-	do {
-		u = fgetc(csvFile);
-		if (u == EOF) break;
-		totalValue = getValueTotal();
-		cout << "TOTAL = " << totalValue << "   linha: " << line << endl;
-		//insertTotalTree(totalTree, totalValue, line);
-		while (u != '\n') {
-			u = fgetc(csvFile);
-			if (u == EOF) break;	
-			if (u == '\n') {
-				line++;
-				break;
-			}
-		}
-
-	} while(u!=EOF);
-	fclose(csvFile);
-}
-
 // pegando os valores de CD e inserindo na arvore cdTree
-void getCdLines(cdNo *cdTree) {
+void getCdLines(totalNo *totalTree, cdNo *cdTree) {
 
-	int line=1;
+	int line=1, totalValue=0;
 	int cdValue=0;
 	char u;
 	do {
 		u = fgetc(csvFile);
 		if (u == EOF) break;
 		cdValue = getCdValue();
+		totalValue = getNewTotalValue();
+		//cout << "TOTAL = " << totalValue << "    linha: " << line << endl;
 		//cout << "CD = " << cdValue << "   linha: " << line << endl;
+		insertTotalTree(totalTree, totalValue, line);
 		insertCdTree(cdTree, cdValue, line);
 		while (u != '\n') {
 			u = fgetc(csvFile);
@@ -342,6 +400,16 @@ void showCdTree(cdNo *cdTree) {
 	}
 }
 
+// mostra o conteúdo da árvore TOTAL
+void showTotalTree(totalNo *totalTree) {
+	
+	if (totalTree != NULL) {
+		showTotalTree(totalTree->left);
+		cout << "TOTAL: " << totalTree->total << "   linha: " << totalTree->line << endl;
+		showTotalTree(totalTree->right); 
+	}
+}
+
 // menu principal
 int menu() {
 	int opt=0;
@@ -377,10 +445,9 @@ void Options (totalNo *totalTree, cdNo *cdTree, ufNo *ufTree, int Option) {
 		case 1:
 			cdTree->left = NULL;
 			cdTree->right = NULL;
-			getCdLines(cdTree);
 			totalTree->left = NULL;
 			totalTree->right = NULL;
-			//getTotalLines(totalTree);
+			getCdLines(totalTree, cdTree);
 			break;
 
 		case 2:
@@ -388,7 +455,7 @@ void Options (totalNo *totalTree, cdNo *cdTree, ufNo *ufTree, int Option) {
 			subOptions(totalTree, cdTree, choose);
 			break;
 
-		case 4:
+		case 3:
 			uf = Uf();
 			getStateLines(ufTree, uf);
 			showUfTree(ufTree);
@@ -416,7 +483,7 @@ void subOptions (totalNo *totalTree, cdNo *cdTree, int subOption) {
 			break;
 			
 		case 3:
-			
+			showTotalTree(totalTree);
 			break;
 	}
 }
