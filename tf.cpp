@@ -9,7 +9,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string>
+#include <string.h>
 
 using namespace std;
 
@@ -42,6 +42,15 @@ typedef struct totalSearch {
 	struct totalSearch *left;
   struct totalSearch *right;
 }totalNo;
+
+// arvore de busca para MUNICIPIO
+typedef struct citySearch {
+
+	int line;
+	char city[30];
+	struct citySearch *left;
+	struct citySearch *right;
+}cityNo;	
 
 // funções
 void insertUfNo(ufNo *ufTree, int totalValue, int lineNumber);
@@ -284,7 +293,7 @@ int getNewTotalValue() {
 int getCdValue() {
 
 	char w;
-	int cd=0, count=0;
+	int cd=0, count=2;
 	while (count != 2) {
 		w = fgetc(csvFile);
 		if (w == ';') {
@@ -297,19 +306,46 @@ int getCdValue() {
 	return cd;		
 }
 
+// recebe o valor de MUNICIPIO da linha atual
+char *getCity() {
+
+	char w;
+	char *c = (char *) malloc(sizeof(char)*30);
+	int i=0, count=0;
+	while (count != 1) {
+		w = fgetc(csvFile);
+		if (w == ';') {
+			count++;
+		}
+	}
+	if (count == 1) {
+		w = fgetc(csvFile);
+		while (w != ';') {
+			c[i] = w;
+			i++;
+			w = fgetc(csvFile);
+			if (w == ';') break;
+		}
+	}
+	
+	return c;
+}
 // pegando os valores de CD e inserindo na arvore cdTree
 void getCdLines(totalNo *totalTree, cdNo *cdTree) {
 
 	int line=1, totalValue=0;
 	int cdValue=0;
 	char u;
+	char *city = (char *) malloc(sizeof(char)*30);
 	do {
 		u = fgetc(csvFile);
 		if (u == EOF) break;
+		
+		strcpy(city, getCity());
+		cout << "CITY: " << city << endl;
 		cdValue = getCdValue();
 		totalValue = getNewTotalValue();
-		//cout << "TOTAL = " << totalValue << "    linha: " << line << endl;
-		//cout << "CD = " << cdValue << "   linha: " << line << endl;
+		
 		insertTotalTree(totalTree, totalValue, line);
 		insertCdTree(cdTree, cdValue, line);
 		while (u != '\n') {
