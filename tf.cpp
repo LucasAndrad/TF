@@ -61,8 +61,12 @@ char *Uf();
 void showUfTree(ufNo *ufTree);
 int menu();
 int subMenu();
-void Options (totalNo *totalTree, cdNo *cdTree, ufNo *ufTree, int Option);
-void subOptions (totalNo *totalTree, cdNo *cdTree, int subOption);
+void Options (cityNo *cityTree, totalNo *totalTree, cdNo *cdTree, ufNo *ufTree, int Option);
+void subOptions (cityNo *cityTree, totalNo *totalTree, cdNo *cdTree, int subOption);
+
+void insertCityTree(cityNo *cityTree, char *CITYH, int lineNumber);
+void showCityTree(cityNo *cityTree);
+char *getCity();
 
 void showCdTree(cdNo *cdTree);
 void insertCdTree(cdNo *cdTree, int cdValue, int lineNumber);
@@ -83,17 +87,18 @@ int main() {
 	option = menu();
 	cdNo *cdTree = (cdNo *) malloc(sizeof(cdNo));
 	totalNo *totalTree = (totalNo *) malloc(sizeof(totalNo));
-
+	cityNo *cityTree = (cityNo *) malloc(sizeof(cityNo));
 
 	while (option!=5) {
 		csvFile = fopen ("dados.csv", "r");
 		ufNo *ufTree = (ufNo *) malloc(sizeof(ufNo));
-		Options(totalTree, cdTree, ufTree, option);
+		Options(cityTree, totalTree, cdTree, ufTree, option);
 		option = 0;
 		option = menu();		
 	}
+	freeCityTree(cityTree);
 	freeCdTree(cdTree);
-
+	freeTotalTree(totalTree)
 	
 	return 0;
 }
@@ -141,7 +146,46 @@ void insertCdTree(cdNo *cdTree, int cdValue, int lineNumber) {
   return ;
 	
 }
-// insere valor TOTAL na totalTree
+
+// insere valor Municipio na cityTree
+void insertCityTree(cityNo *cityTree, char *CITYH, int lineNumber) {
+
+	cityNo *helperCityTree = (cityNo *) malloc(sizeof(cityNo));
+	
+	strcpy(helperCityTree->city, CITYH);
+	helperCityTree->line = lineNumber;
+	helperCityTree->left = NULL;
+	helperCityTree->right = NULL;
+	
+	if (cityTree == NULL) {
+		cityTree = helperCityTree;
+	}
+	
+	else {
+		cityNo *current = cityTree;
+		cityNo *behind = NULL;
+		while (current != NULL) {
+			behind = current;
+			
+			if ((strcmp(CITYH, current->city)) > 0) {
+				current = current->right;
+			}
+			else {
+				current = current->left;
+			}
+		}
+		if ((strcmp(CITYH, behind->city)) > 0) {
+			behind->right = helperCityTree;
+		}
+		else {
+			behind->left = helperCityTree;
+		}
+		if (current != NULL) {
+			// free
+		}
+	}
+}
+
 // insere valor TOTAL na totalTree
 void insertTotalTree(totalNo *totalTree, int totalValue, int lineNumber) {
 	
@@ -153,11 +197,10 @@ void insertTotalTree(totalNo *totalTree, int totalValue, int lineNumber) {
   helperTotalTree->right = NULL;
 
 	if (totalTree == NULL) {
-			totalTree = helperTotalTree; cout << "entra no if\n";
+			totalTree = helperTotalTree;
 	}
 
 	else {
-		//cout << "entra no else\n";
 		totalNo *current =totalTree;
 		totalNo *behind = NULL;
 		while (current != NULL) {
@@ -177,7 +220,7 @@ void insertTotalTree(totalNo *totalTree, int totalValue, int lineNumber) {
 			behind->left = helperTotalTree;
 		}
 		if (current != NULL) {
-			freeTotalTree(current); cout << "libere as arvores\n";
+			freeTotalTree(current);
 			freeTotalTree(behind);
 			freeTotalTree(helperTotalTree);
 		}
@@ -331,7 +374,7 @@ char *getCity() {
 	return c;
 }
 // pegando os valores de CD e inserindo na arvore cdTree
-void getCdLines(totalNo *totalTree, cdNo *cdTree) {
+void getCdLines(cityNo *cityTree, totalNo *totalTree, cdNo *cdTree) {
 
 	int line=1, totalValue=0;
 	int cdValue=0;
@@ -342,10 +385,10 @@ void getCdLines(totalNo *totalTree, cdNo *cdTree) {
 		if (u == EOF) break;
 		
 		strcpy(city, getCity());
-		cout << "CITY: " << city << endl;
 		cdValue = getCdValue();
 		totalValue = getNewTotalValue();
 		
+		insertCityTree(cityTree, city, line);
 		insertTotalTree(totalTree, totalValue, line);
 		insertCdTree(cdTree, cdValue, line);
 		while (u != '\n') {
@@ -426,6 +469,16 @@ void showUfTree(ufNo *ufTree) {
 	}
 }
 
+// mostra o conteúdo da árvore MUNICIPIO
+void showCityTree(cityNo *cityTree) {
+
+	if (cityTree != NULL) {
+		showCityTree(cityTree->left);
+		cout << "MUNICIPIO: "<< cityTree->city << "   linha: "<< cityTree->line << endl;
+		showCityTree(cityTree->right);
+	}
+}
+
 // mostra o conteúdo da árvore CD
 void showCdTree(cdNo *cdTree) {
 
@@ -471,7 +524,7 @@ int subMenu() {
 }
 
 // executando ações do menu
-void Options (totalNo *totalTree, cdNo *cdTree, ufNo *ufTree, int Option) {
+void Options (cityNo *cityTree, totalNo *totalTree, cdNo *cdTree, ufNo *ufTree, int Option) {
 	
 	int choose=0;
 	char *uf;
@@ -479,16 +532,18 @@ void Options (totalNo *totalTree, cdNo *cdTree, ufNo *ufTree, int Option) {
 	switch (Option) {
 		
 		case 1:
+			cityTree->left = NULL;
+			cityTree->right = NULL;
 			cdTree->left = NULL;
 			cdTree->right = NULL;
 			totalTree->left = NULL;
 			totalTree->right = NULL;
-			getCdLines(totalTree, cdTree);
+			getCdLines(cityTree, totalTree, cdTree);
 			break;
 
 		case 2:
 			choose = subMenu();
-			subOptions(totalTree, cdTree, choose);
+			subOptions(cityTree, totalTree, cdTree, choose);
 			break;
 
 		case 3:
@@ -508,10 +563,11 @@ void Options (totalNo *totalTree, cdNo *cdTree, ufNo *ufTree, int Option) {
 }
 
 //opcões de ordenamento da opção 2 do menu principal
-void subOptions (totalNo *totalTree, cdNo *cdTree, int subOption) {
+void subOptions (cityNo *cityTree, totalNo *totalTree, cdNo *cdTree, int subOption) {
 
 	switch (subOption) {
 		case 1:
+			showCityTree(cityTree);
 			break;
 			
 		case 2:
