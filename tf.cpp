@@ -1,6 +1,6 @@
 /* 
 Aluno: Lucas Andrade Oliveira
-Matricula: 140026037
+Matricula: 14/0026037
 UNB - Engenharia de Software
 Trabalho Final de EDA
 
@@ -62,6 +62,7 @@ void freeUfTree(ufNo *&ufTree);
 int getValueTotal();
 void getStateLines(ufNo *ufTree, char *STATE);
 char *Uf();
+void showOneCity(cityNo *cityTree, char *oneCity);
 void showUfTree(ufNo *ufTree);
 int menu();
 int subMenu();
@@ -102,6 +103,7 @@ int main() {
 		option = 0;
 		option = menu();		
 	}
+	// free all trees
 	freeCityTree(cityTree);
 	freeCdTree(cdTree);
 	freeTotalTree(totalTree);
@@ -187,7 +189,9 @@ void insertCityTree(cityNo *cityTree, char *CITYH, int lineNumber) {
 			behind->left = helperCityTree;
 		}
 		if (current != NULL) {
-			// free
+			freeCityTree(current);
+			freeCityTree(behind);
+			freeCityTree(helperCityTree);
 		}
 	}
 }
@@ -263,11 +267,17 @@ void insertUfNo(ufNo *ufTree, int totalValue, int lineNumber) {
 				current = current->left;
 			}
 		}
+		
 		if (totalValue > behind->total) {
 			behind->right = helperUfTree;
 		}
 		else {
 			behind->left = helperUfTree;
+		}
+		if (current != NULL) {
+			freeUfTree(current);
+			freeUfTree(behind);
+			freeUfTree(helperUfTree);
 		}
    
   }
@@ -351,17 +361,9 @@ int getNewTotalValue() {
 // recebe o valor CD da linha atual do arquivo
 int getCdValue() {
 
-	char w;
-	int cd=0, count=2;
-	while (count != 2) {
-		w = fgetc(csvFile);
-		if (w == ';') {
-			count++;
-		}
-	}
-	if (count == 2) {
-		fscanf(csvFile, "%d", &cd);
-	}
+	int cd=0;
+	fscanf(csvFile, "%d", &cd);
+	
 	return cd;		
 }
 

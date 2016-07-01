@@ -1,0 +1,49 @@
+Ordem de Complexidade
+ 
+Aluno: Lucas Andrade Oliveira
+Matricula: 14/0026037
+UNB - Engenharia de Software
+Trabalho Final de EDA
+
+SISTEMA OPERACIONAL LINUX - UBUNTU 15.04
+-----------------------------------------------
+Abaixo vão ser listadas a ordem de complexidade de cada função utilizada no arquivo programa tf.cpp:
+Inserção: 
+insertUfNo
+insertCityTree
+insertCdTree
+insertTotalTree
+Todas as "inserts" possuem complexidade O(h) onde h é a altura até o ramo que realiza a inclusão.
+
+Libera:
+freeTotalTree
+freeUfTree
+freeCityTree
+freeCdTree
+Todas as funções Libera posuem complexidade O(n) onde n é o número de ramos que a árvore precisa liberar.
+
+Recebe:
+getNewTotalValue
+Complexidade O(8): pois para o arquivo dados.csv o loop vai executar apenas 8 vezes;
+
+getCdValue
+Complexidade O(1): pois para o arquivo dados.csv será executado apenas um comando.
+
+getCity
+Complexidade O(2*n) para o arquivo dados.csv, onde n é o número de caracteres do municipio. 
+
+getValueTotal
+Complexidade O(10) para o arquivo dados.csv 
+
+getCdLines
+Complexidade O(n*80) para o arquivo dados.csv onde n é o número de linhas.
+
+getStateLines
+Complexidade O(n*80) para o arquivo dados.csv onde n é o número de linhas.
+
+Variáveis:
+Uf
+Complexidade O(3)
+
+CITY
+Complexidade O(3)
