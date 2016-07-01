@@ -7,6 +7,13 @@ Trabalho Final de EDA
 
 SISTEMA OPERACIONAL LINUX - UBUNTU 15.04
 -----------------------------------------------
+Ordem de complexidade das opções do menu:
+1 - Importar dados - Complexidade O(t*n) onde n é o número de linhas do arquivo e t o tamanho máximo da linha
+2 - Relatórios - Complexidade O(n) para os relatórios CD, total e município
+3 - Relatório por Estado - Complexidade O(n)
+4 - Relatório por Município - Complexidade O(lg(n)) por é uma busca binária
+5 - Sair - Complexidade: O(1)
+-----------------------------------------------
 Abaixo vão ser listadas a ordem de complexidade de cada função utilizada no arquivo programa tf.cpp:
 Inserção: 
 insertUfNo
@@ -24,7 +31,7 @@ Todas as funções Libera posuem complexidade O(n) onde n é o número de ramos 
 
 Recebe:
 getNewTotalValue
-Complexidade O(8): pois para o arquivo dados.csv o loop vai executar apenas 8 vezes;
+Complexidade O(8): pois para o arquivo dados.csv o loop vai executar apenas 8 vezes.
 
 getCdValue
 Complexidade O(1): pois para o arquivo dados.csv será executado apenas um comando.
@@ -47,3 +54,29 @@ Complexidade O(3)
 
 CITY
 Complexidade O(3)
+
+Mostrar:
+showUfTree
+showCityTree
+showCdTree
+showTotalTree
+Todos os shows acima possuem a mesma complexidade O(h) onde h é a altura da árvore.
+
+Mostrar:
+showOneCity
+Complexidade O(lg(n)) pois é em uma busca binária.
+
+showAllData
+Complexidade O(n) onde n é o número da linha.
+
+Exibir:
+menu
+subMenu
+Complexidade O(1)
+
+Opções: 
+Options
+Complexidade O(5*n)
+
+subOptions
+Complexidade O(3*n)

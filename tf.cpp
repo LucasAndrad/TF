@@ -562,11 +562,11 @@ void showAllData(int lineH) {
 // menu principal
 int menu() {
 	int opt=0;
-	cout << "\n\nEscolha uma opção:\n";
+	cout << "\n\nEscolha uma opcao:\n";
 	cout << "1 - Importar dados\n";
-	cout << "2 - Gerar relatório (ordenados por):\n";
-	cout << "3 - Relatório de um Estado\n";
-	cout << "4 - Consultadar dados de um Município\n";
+	cout << "2 - Gerar relatorio (ordenados por):\n";
+	cout << "3 - Relatorio de um Estado\n";
+	cout << "4 - Consultadar dados de um Municipio\n";
 	cout << "5 - Sair do sistema\n";
 	cin >> opt;
 	return opt;
@@ -576,7 +576,7 @@ int menu() {
 int subMenu() {
 
 	int opt=0;
-	cout << "\n1 - Município\n";
+	cout << "\n1 - Municipio\n";
 	cout << "2 - CD\n";
 	cout << "3 - Total\n";
 	cin >> opt;
