@@ -1,15 +1,18 @@
-// *** LINKS 
-// https://www.youtube.com/watch?v=8cdbmsPaR-k
-// https://www.youtube.com/watch?v=PsH737U2Mnc
-// http://www.ime.usp.br/~pf/algoritmos/aulas/binst.html
-// https://pt.wikibooks.org/wiki/Programar_em_C/%C3%81rvores_bin%C3%A1rias
-//*********************
-// PRECISA JUNTAR OS GETS. COLOCAR O GET CD, GET TOTAL E GET MUNICIPIO TODOS JUNTOS.
+/* 
+Aluno: Lucas Andrade Oliveira
+Matricula: 140026037
+UNB - Engenharia de Software
+Trabalho Final de EDA
+
+SISTEMA OPERACIONAL LINUX - UBUNTU 15.04
+
+*/
 
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 using namespace std;
 
@@ -79,6 +82,7 @@ int getCdValue();
 int getNewTotalValue();
 void insertTotalTree(totalNo *totalTree, int totalValue, int lineNumber);
 void getCdLines(totalNo *totalTree, cdNo *cdTree);
+void freeCityTree(cityNo *&cityTree);
 
 void showTotalTree(totalNo *totalTree);
 
@@ -98,7 +102,7 @@ int main() {
 		option = 0;
 		option = menu();		
 	}
-	//freeCityTree(cityTree);
+	freeCityTree(cityTree);
 	freeCdTree(cdTree);
 	freeTotalTree(totalTree);
 	
@@ -301,6 +305,16 @@ void freeCdTree(cdNo *&cdTree) {
     }
 }
 
+// libera cada nó da árvore CD
+void freeCityTree(cityNo *&cityTree) {
+    if(cityTree != NULL) {
+        freeCityTree(cityTree->left);
+        freeCityTree(cityTree->right);
+        free(cityTree);
+        cityTree = NULL;
+    }
+}
+
 // recebe o valor Total de linha atual no arquivo
 int getValueTotal() {
 
@@ -461,6 +475,16 @@ char *Uf() {
 	return state; 
 }
 
+// recebe o municipio digitado pelo usuario
+char *CITY() {
+
+	char *cidade = (char *) malloc(sizeof(char)*30);
+	
+	cout << "Digite o municipio que deseja consultar\n";	 
+	cin >> cidade;
+	return cidade;
+}
+
 // mostra o conteúdo da árvore UF
 void showUfTree(ufNo *ufTree) {
 
@@ -470,6 +494,18 @@ void showUfTree(ufNo *ufTree) {
 		showAllData(ufTree->line);
 		showUfTree(ufTree->right);
 	}
+}
+
+// mostra apenas o municipio digitado pelo usuario
+void showOneCity(cityNo *cityTree, char *oneCity) {
+	
+	if (cityTree != NULL) {
+		showOneCity(cityTree->left, oneCity);
+		if (strcmp(oneCity, cityTree->city) == 0) {
+			showAllData(cityTree->line);
+		}
+		showOneCity(cityTree->right, oneCity);
+	}		
 }
 
 // mostra o conteúdo da árvore MUNICIPIO
@@ -550,6 +586,7 @@ void Options (cityNo *cityTree, totalNo *totalTree, cdNo *cdTree, ufNo *ufTree, 
 	
 	int choose=0;
 	char *uf;
+	char *cidad;
 	
 	switch (Option) {
 		
@@ -573,6 +610,11 @@ void Options (cityNo *cityTree, totalNo *totalTree, cdNo *cdTree, ufNo *ufTree, 
 			getStateLines(ufTree, uf);
 			showUfTree(ufTree);
 			freeUfTree(ufTree);
+			break;
+	
+		case 4:
+			cidad = CITY();
+			showOneCity(cityTree, cidad);
 			break;
 
 		case 5: 
